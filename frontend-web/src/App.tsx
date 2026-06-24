@@ -21,6 +21,7 @@ import {
   FileText,
   Truck
 } from 'lucide-react';
+import { translations } from './translations';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -118,6 +119,20 @@ export default function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  
+  // Language configuration (default 'es')
+  const [lang, setLang] = useState<'es' | 'en'>(() => {
+    const saved = localStorage.getItem('app_lang');
+    return (saved === 'en' || saved === 'es') ? saved : 'es';
+  });
+  
+  const t = translations[lang];
+
+  const toggleLanguage = () => {
+    const nextLang = lang === 'es' ? 'en' : 'es';
+    setLang(nextLang);
+    localStorage.setItem('app_lang', nextLang);
+  };
   
   // Dashboard & Navigation state
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'transfers'>('dashboard');
@@ -471,15 +486,15 @@ export default function App() {
         <div className="auth-card">
           <div className="auth-header">
             <div className="auth-logo">IV</div>
-            <h2>Inventory System</h2>
-            <div className="auth-subtitle">Log in to manage warehouses & track stock</div>
+            <h2>{t.loginTitle}</h2>
+            <div className="auth-subtitle">{t.loginSubtitle}</div>
           </div>
           
-          {loginError && <div className="auth-error">{loginError}</div>}
+          {loginError && <div className="auth-error">{t.invalidCredentials}</div>}
           
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label className="form-label">Username</label>
+              <label className="form-label">{t.username}</label>
               <input 
                 type="text" 
                 className="form-input" 
@@ -491,7 +506,7 @@ export default function App() {
             </div>
             
             <div className="form-group">
-              <label className="form-label">Password</label>
+              <label className="form-label">{t.password}</label>
               <input 
                 type="password" 
                 className="form-input" 
@@ -503,9 +518,26 @@ export default function App() {
             </div>
             
             <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
-              Access Dashboard
+              {t.signIn}
             </button>
           </form>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', gap: '16px' }}>
+            <button 
+              onClick={() => setLang('es')} 
+              className={`tab-btn ${lang === 'es' ? 'active' : ''}`}
+              style={{ padding: '4px 8px', fontSize: '0.7rem', letterSpacing: '1px', borderBottomWidth: lang === 'es' ? '2px' : '0' }}
+            >
+              ESPAÑOL
+            </button>
+            <button 
+              onClick={() => setLang('en')} 
+              className={`tab-btn ${lang === 'en' ? 'active' : ''}`}
+              style={{ padding: '4px 8px', fontSize: '0.7rem', letterSpacing: '1px', borderBottomWidth: lang === 'en' ? '2px' : '0' }}
+            >
+              ENGLISH
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -526,28 +558,28 @@ export default function App() {
             onClick={() => setActiveTab('dashboard')}
           >
             <LayoutDashboard size={20} />
-            <span>Dashboard</span>
+            <span>{t.dashboard}</span>
           </li>
           <li 
             className={`sidebar-item ${activeTab === 'products' ? 'active' : ''}`}
             onClick={() => setActiveTab('products')}
           >
             <Package size={20} />
-            <span>Products</span>
+            <span>{t.products}</span>
           </li>
           <li 
             className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveTab('orders')}
           >
             <ShoppingCart size={20} />
-            <span>Purchase Orders</span>
+            <span>{t.orders}</span>
           </li>
           <li 
             className={`sidebar-item ${activeTab === 'transfers' ? 'active' : ''}`}
             onClick={() => setActiveTab('transfers')}
           >
             <ArrowLeftRight size={20} />
-            <span>Stock Transfers</span>
+            <span>{t.transfers}</span>
           </li>
         </ul>
 
@@ -570,12 +602,22 @@ export default function App() {
             <div className="avatar">A</div>
             <div className="user-info">
               <span className="username">Admin User</span>
-              <span className="user-role">Warehouse Admin</span>
+              <span className="user-role">{t.role}</span>
             </div>
           </div>
-          <button onClick={handleLogout} className="modal-close" title="Log Out">
-            <LogOut size={18} />
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button 
+              onClick={toggleLanguage} 
+              className="modal-close" 
+              style={{ fontSize: '0.7rem', fontWeight: 'bold', border: '1px solid var(--border-hairline)', padding: '2px 6px', color: 'var(--primary)', cursor: 'pointer' }}
+              title={lang === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+            >
+              {lang === 'es' ? 'EN' : 'ES'}
+            </button>
+            <button onClick={handleLogout} className="modal-close" title={t.logout}>
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -585,32 +627,32 @@ export default function App() {
         {/* HEADER */}
         <header className="page-header">
           <div className="page-title-group">
-            <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
-            <p className="page-subtitle">Real-time inventory orchestration panel</p>
+            <h1>{t[activeTab as 'dashboard' | 'products' | 'orders' | 'transfers']}</h1>
+            <p className="page-subtitle">{t.title}</p>
           </div>
           <div className="header-actions">
             <div className="realtime-badge">
               <div className="pulse-dot"></div>
-              <span>Live Updates Active</span>
+              <span>{lang === 'es' ? 'Actualizaciones en Vivo' : 'Live Updates Active'}</span>
             </div>
             {activeTab === 'products' && (
               <>
                 <button className="btn btn-secondary" onClick={() => setShowAdjustModal(true)}>
-                  <Layers size={16} /> Adjust Stock
+                  <Layers size={16} /> {t.btnAdjustStock}
                 </button>
                 <button className="btn btn-primary" onClick={() => setShowProductModal(true)}>
-                  <Plus size={16} /> New Product
+                  <Plus size={16} /> {t.btnNewProduct}
                 </button>
               </>
             )}
             {activeTab === 'orders' && (
               <button className="btn btn-primary" onClick={() => setShowPOModal(true)}>
-                <Plus size={16} /> Create PO
+                <Plus size={16} /> {t.btnNewPO}
               </button>
             )}
             {activeTab === 'transfers' && (
               <button className="btn btn-primary" onClick={() => setShowTransferModal(true)}>
-                <ArrowLeftRight size={16} /> Initiate Transfer
+                <ArrowLeftRight size={16} /> {t.btnNewTransfer}
               </button>
             )}
           </div>
@@ -621,34 +663,34 @@ export default function App() {
           <section className="metrics-grid">
             <div className={`metric-card ${isFlashUpdated ? 'flash-updated' : ''}`}>
               <div className="metric-header">
-                <span className="metric-title">Product Catalog</span>
+                <span className="metric-title">{t.totalProducts}</span>
                 <div className="metric-icon"><Package size={18} /></div>
               </div>
               <div className="metric-value">{analytics.metrics.total_products}</div>
-              <div className="metric-footer">Active SKU types registered</div>
+              <div className="metric-footer">{lang === 'es' ? 'SKUs únicos registrados' : 'Active SKU types registered'}</div>
             </div>
 
             <div className={`metric-card ${isFlashUpdated ? 'flash-updated' : ''}`}>
               <div className="metric-header">
-                <span className="metric-title">Stock Valuation</span>
+                <span className="metric-title">{t.valuation}</span>
                 <div className="metric-icon"><DollarSign size={18} /></div>
               </div>
               <div className="metric-value">${analytics.metrics.total_stock_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              <div className="metric-footer">Net inventory asset value</div>
+              <div className="metric-footer">{lang === 'es' ? 'Valor neto de activos' : 'Net inventory asset value'}</div>
             </div>
 
             <div className={`metric-card ${isFlashUpdated ? 'flash-updated' : ''}`}>
               <div className="metric-header">
-                <span className="metric-title">Total Units</span>
+                <span className="metric-title">{lang === 'es' ? 'Unidades Totales' : 'Total Units'}</span>
                 <div className="metric-icon"><TrendingUp size={18} /></div>
               </div>
               <div className="metric-value">{analytics.metrics.total_units}</div>
-              <div className="metric-footer">Units across all warehouses</div>
+              <div className="metric-footer">{lang === 'es' ? 'Stock disponible en almacenes' : 'Units across all warehouses'}</div>
             </div>
 
             <div className={`metric-card ${isFlashUpdated ? 'flash-updated' : ''}`}>
               <div className="metric-header">
-                <span className="metric-title">Low Stock Alert</span>
+                <span className="metric-title">{t.activeAlerts}</span>
                 <div className="metric-icon" style={{ color: analytics.metrics.low_stock_count > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
                   <AlertTriangle size={18} />
                 </div>
@@ -656,7 +698,7 @@ export default function App() {
               <div className="metric-value" style={{ color: analytics.metrics.low_stock_count > 0 ? 'var(--danger)' : 'inherit' }}>
                 {analytics.metrics.low_stock_count}
               </div>
-              <div className="metric-footer">Items below minimum safety stock</div>
+              <div className="metric-footer">{lang === 'es' ? 'Productos bajo el mínimo de seguridad' : 'Items below minimum safety stock'}</div>
             </div>
           </section>
         )}
@@ -669,8 +711,8 @@ export default function App() {
             {/* Custom Category Chart Card */}
             <div className="card">
               <div className="card-title">
-                <span>Stock Distribution by Category</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Product counts</span>
+                <span>{lang === 'es' ? 'Distribución de Stock por Categoría' : 'Stock Distribution by Category'}</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{lang === 'es' ? 'Cantidad de productos' : 'Product counts'}</span>
               </div>
               
               <div className="chart-container">
@@ -680,7 +722,7 @@ export default function App() {
                   return (
                     <div key={idx} className="chart-bar-wrapper">
                       <div className="chart-bar" style={{ height: `${heightPercent}%` }}>
-                        <div className="chart-tooltip">{item.item_count} items</div>
+                        <div className="chart-tooltip">{item.item_count} {lang === 'es' ? 'productos' : 'items'}</div>
                       </div>
                       <span className="chart-label">{item.name}</span>
                     </div>
@@ -689,7 +731,7 @@ export default function App() {
               </div>
 
               <div style={{ marginTop: '24px' }}>
-                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase' }}>Warehouse Overviews</h4>
+                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase' }}>{lang === 'es' ? 'Resumen de Almacenes' : 'Warehouse Overviews'}</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   {warehouses.map(w => {
                     const pct = Math.min((w.current_total_stock / w.capacity) * 100, 100);
@@ -697,7 +739,7 @@ export default function App() {
                       <div key={w.id} style={{ backgroundColor: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '8px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '8px' }}>
                           <span style={{ fontWeight: '600' }}>{w.name}</span>
-                          <span style={{ color: 'var(--text-secondary)' }}>{w.current_total_stock} / {w.capacity} units</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>{w.current_total_stock} / {w.capacity} {lang === 'es' ? 'unidades' : 'units'}</span>
                         </div>
                         <div className="progress-track" style={{ height: '4px' }}>
                           <div className="progress-bar normal" style={{ width: `${pct}%` }}></div>
@@ -711,7 +753,7 @@ export default function App() {
 
             {/* Recent Activities Feed */}
             <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="card-title">Recent Stock Activity</div>
+              <div className="card-title">{t.recentMovementsTitle}</div>
               <div className="log-list" style={{ flexGrow: 1, overflowY: 'auto' }}>
                 {analytics.recent_transactions.map((tx: any) => (
                   <div key={tx.id} className="log-item">
@@ -727,7 +769,9 @@ export default function App() {
                         tx.type === 'OUT' ? 'badge-out' : 
                         tx.type === 'TRANSFER' ? 'badge-transfer' : 'badge-adjustment'
                       }`}>
-                        {tx.type}
+                        {tx.type === 'IN' ? t.badgeIn : 
+                         tx.type === 'OUT' ? t.badgeOut : 
+                         tx.type === 'TRANSFER' ? t.badgeTransfer : t.badgeAdjustment}
                       </span>
                       <div className="log-qty" style={{ 
                         color: tx.type === 'IN' ? 'var(--success)' : 
@@ -741,7 +785,7 @@ export default function App() {
                 ))}
                 {analytics.recent_transactions.length === 0 && (
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>
-                    No stock transaction records found.
+                    {t.noMovements}
                   </div>
                 )}
               </div>
@@ -759,7 +803,7 @@ export default function App() {
                 <input 
                   type="text" 
                   className="form-input" 
-                  placeholder="Search products by SKU, name, description..." 
+                  placeholder={t.searchPlaceholder} 
                   style={{ paddingLeft: '38px' }}
                   value={prodSearch}
                   onChange={e => setProdSearch(e.target.value)}
@@ -772,7 +816,7 @@ export default function App() {
                 value={prodCategory}
                 onChange={e => setProdCategory(e.target.value)}
               >
-                <option value="">All Categories</option>
+                <option value="">{t.allCategories}</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
@@ -780,7 +824,7 @@ export default function App() {
                 className={`btn ${prodLowStockOnly ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setProdLowStockOnly(!prodLowStockOnly)}
               >
-                <AlertTriangle size={16} /> Low Stock Only
+                <AlertTriangle size={16} /> {t.lowStockFilter}
               </button>
             </div>
 
@@ -789,13 +833,13 @@ export default function App() {
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>SKU</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Warehouse Stocks</th>
-                    <th>Total Available</th>
-                    <th>Stock Alert Level</th>
+                    <th>{t.sku}</th>
+                    <th>{t.name}</th>
+                    <th>{t.category}</th>
+                    <th>{t.price}</th>
+                    <th>{t.whStocks}</th>
+                    <th>{t.totalAvail}</th>
+                    <th>{t.alertLevel}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -819,8 +863,7 @@ export default function App() {
                               <span key={s.id} style={{ fontSize: '0.75rem' }}>
                                 🏢 {s.warehouse_name}: <strong>{s.quantity}</strong>
                               </span>
-                            ))}
-                            {p.stocks.length === 0 && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>No warehouse stock</span>}
+                                               {p.stocks.length === 0 && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{lang === 'es' ? 'Sin stock en depósito' : 'No warehouse stock'}</span>}
                           </div>
                         </td>
                         <td>
@@ -835,7 +878,7 @@ export default function App() {
                         </td>
                         <td>
                           <span style={{ fontSize: '0.8rem', color: isLow ? 'var(--danger)' : 'var(--text-muted)' }}>
-                            {p.min_stock_level} units
+                            {p.min_stock_level} {lang === 'es' ? 'unidades' : 'units'}
                           </span>
                         </td>
                       </tr>
@@ -844,10 +887,10 @@ export default function App() {
                   {products.length === 0 && (
                     <tr>
                       <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-                        No products match the active filter criteria.
+                        {t.emptyProducts}
                       </td>
                     </tr>
-                  )}
+                  )}             )}
                 </tbody>
               </table>
             </div>
@@ -861,13 +904,13 @@ export default function App() {
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>PO Number</th>
-                    <th>Supplier</th>
-                    <th>Created Date</th>
-                    <th>Items Count</th>
-                    <th>Total Amount</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{lang === 'es' ? 'Nro PO' : 'PO Number'}</th>
+                    <th>{t.supplier}</th>
+                    <th>{t.date}</th>
+                    <th>{t.items}</th>
+                    <th>{t.totalAmount}</th>
+                    <th>{t.status}</th>
+                    <th style={{ textAlign: 'right' }}>{t.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -876,7 +919,7 @@ export default function App() {
                       <td style={{ fontWeight: '600', color: 'var(--primary)' }}>{o.order_number}</td>
                       <td>{o.supplier_name}</td>
                       <td>{new Date(o.created_at).toLocaleDateString()}</td>
-                      <td>{o.items.length} unique items</td>
+                      <td>{o.items.length} {lang === 'es' ? 'ítems únicos' : 'unique items'}</td>
                       <td style={{ fontWeight: '600' }}>${parseFloat(o.total_amount as any).toFixed(2)}</td>
                       <td>
                         <span className={`badge ${
@@ -884,7 +927,9 @@ export default function App() {
                           o.status === 'APPROVED' ? 'badge-approved' :
                           o.status === 'RECEIVED' ? 'badge-received' : 'badge-cancelled'
                         }`}>
-                          {o.status}
+                          {o.status === 'PENDING' ? t.badgePending :
+                           o.status === 'APPROVED' ? t.badgeApproved :
+                           o.status === 'RECEIVED' ? t.badgeReceived : t.badgeCancelled}
                         </span>
                       </td>
                       <td style={{ textAlign: 'right' }}>
@@ -896,14 +941,14 @@ export default function App() {
                                 style={{ padding: '6px 12px', fontSize: '0.75rem' }}
                                 onClick={() => handlePOStatusUpdate(o.id, 'APPROVED')}
                               >
-                                Approve
+                                {t.btnApprove}
                               </button>
                               <button 
                                 className="btn btn-danger" 
                                 style={{ padding: '6px 12px', fontSize: '0.75rem', boxShadow: 'none' }}
                                 onClick={() => handlePOStatusUpdate(o.id, 'CANCELLED')}
                               >
-                                Cancel
+                                {t.btnCancel}
                               </button>
                             </>
                           )}
@@ -913,14 +958,14 @@ export default function App() {
                               style={{ padding: '6px 12px', fontSize: '0.75rem', boxShadow: 'none' }}
                               onClick={() => handlePOStatusUpdate(o.id, 'RECEIVED')}
                             >
-                              <Truck size={12} /> Receive Stock
+                              <Truck size={12} /> {t.btnReceive}
                             </button>
                           )}
                           {o.status === 'RECEIVED' && (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Processed in Stock</span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{lang === 'es' ? 'Procesado en Stock' : 'Processed in Stock'}</span>
                           )}
                           {o.status === 'CANCELLED' && (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Voided</span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{lang === 'es' ? 'Anulada' : 'Voided'}</span>
                           )}
                         </div>
                       </td>
@@ -929,7 +974,7 @@ export default function App() {
                   {orders.length === 0 && (
                     <tr>
                       <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-                        No Purchase Orders created yet.
+                        {t.emptyOrders}
                       </td>
                     </tr>
                   )}
@@ -942,29 +987,29 @@ export default function App() {
         {/* STOCK TRANSFERS TAB */}
         {activeTab === 'transfers' && (
           <div className="card">
-            <div className="card-title">Active Warehouse Stocks</div>
+            <div className="card-title">{lang === 'es' ? 'Existencias Activas en Almacenes' : 'Active Warehouse Stocks'}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
               {warehouses.map(w => (
                 <div key={w.id} style={{ backgroundColor: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '20px' }}>
                   <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', marginBottom: '6px' }}>
                     🏢 {w.name}
                   </h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>{w.location || 'No location set'}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>{w.location || (lang === 'es' ? 'Sin ubicación registrada' : 'No location set')}</p>
                   
                   <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
-                    <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '10px' }}>Stored SKUs</h4>
+                    <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '10px' }}>{lang === 'es' ? 'SKUs Almacenados' : 'Stored SKUs'}</h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {products.filter(p => p.stocks.some(s => s.warehouse === w.id)).map(p => {
                         const qty = p.stocks.find(s => s.warehouse === w.id)?.quantity || 0;
                         return (
                           <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                             <span>{p.name} ({p.sku})</span>
-                            <strong style={{ color: 'var(--primary)' }}>{qty} units</strong>
+                            <strong style={{ color: 'var(--primary)' }}>{qty} {lang === 'es' ? 'unidades' : 'units'}</strong>
                           </div>
                         );
                       })}
                       {products.filter(p => p.stocks.some(s => s.warehouse === w.id)).length === 0 && (
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '10px' }}>Empty Warehouse</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '10px' }}>{lang === 'es' ? 'Almacén Vacío' : 'Empty Warehouse'}</p>
                       )}
                     </div>
                   </div>
@@ -972,38 +1017,40 @@ export default function App() {
               ))}
             </div>
 
-            <div className="card-title">Transfer History Logs</div>
+            <div className="card-title">{lang === 'es' ? 'Historial de Transferencias' : 'Transfer History Logs'}</div>
             <div className="table-container">
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>Log Time</th>
-                    <th>Product</th>
-                    <th>Movement</th>
-                    <th>Quantity</th>
-                    <th>Reference</th>
-                    <th>Initiated By</th>
+                    <th>{lang === 'es' ? 'Fecha y Hora' : 'Log Time'}</th>
+                    <th>{lang === 'es' ? 'Producto' : 'Product'}</th>
+                    <th>{lang === 'es' ? 'Movimiento' : 'Movement'}</th>
+                    <th>{t.qty}</th>
+                    <th>{t.refId}</th>
+                    <th>{lang === 'es' ? 'Iniciado por' : 'Initiated By'}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.filter(t => t.type === 'TRANSFER' || t.reference_id?.includes('TRANSFER')).map(t => (
-                    <tr key={t.id}>
-                      <td>{new Date(t.created_at).toLocaleString()}</td>
-                      <td style={{ fontWeight: '500' }}>{t.product_name}</td>
+                  {transactions.filter(t => t.type === 'TRANSFER' || t.reference_id?.includes('TRANSFER')).map(tx => (
+                    <tr key={tx.id}>
+                      <td>{new Date(tx.created_at).toLocaleString()}</td>
+                      <td style={{ fontWeight: '500' }}>{tx.product_name}</td>
                       <td>
                         <span className="badge badge-transfer">
-                          {t.reference_id?.startsWith('TRANSFER_TO') ? `TRANSFER OUT ➔ WH ${t.reference_id.split('_').pop()}` : `TRANSFER IN ➔ ${t.warehouse_name}`}
+                          {tx.reference_id?.startsWith('TRANSFER_TO') ? 
+                            (lang === 'es' ? `ENVÍO ➔ WH ${tx.reference_id.split('_').pop()}` : `TRANSFER OUT ➔ WH ${tx.reference_id.split('_').pop()}`) : 
+                            (lang === 'es' ? `RECEPCIÓN ➔ ${tx.warehouse_name}` : `TRANSFER IN ➔ ${tx.warehouse_name}`)}
                         </span>
                       </td>
-                      <td style={{ fontWeight: '600' }}>{t.quantity} units</td>
-                      <td>{t.reference_id}</td>
-                      <td>{t.user_name}</td>
+                      <td style={{ fontWeight: '600' }}>{tx.quantity} {lang === 'es' ? 'unidades' : 'units'}</td>
+                      <td>{tx.reference_id}</td>
+                      <td>{tx.user_name}</td>
                     </tr>
                   ))}
                   {transactions.filter(t => t.type === 'TRANSFER' || t.reference_id?.includes('TRANSFER')).length === 0 && (
                     <tr>
                       <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-                        No stock transfers performed yet.
+                        {lang === 'es' ? 'No se han realizado transferencias de stock.' : 'No stock transfers performed yet.'}
                       </td>
                     </tr>
                   )}
@@ -1022,13 +1069,13 @@ export default function App() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h2>Add New Product SKU</h2>
+              <h2>{t.modalNewProduct}</h2>
               <button className="modal-close" onClick={() => setShowProductModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateProduct}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">SKU Code</label>
+                  <label className="form-label">{t.sku}</label>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -1039,7 +1086,7 @@ export default function App() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Product Name</label>
+                  <label className="form-label">{t.name}</label>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -1050,17 +1097,17 @@ export default function App() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Description</label>
+                  <label className="form-label">{t.labelDescription}</label>
                   <textarea 
                     className="form-input" 
-                    placeholder="Brief details..."
+                    placeholder={t.phDescription}
                     value={newProduct.description}
                     onChange={e => setNewProduct({...newProduct, description: e.target.value})}
                   />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
-                    <label className="form-label">Unit Price ($)</label>
+                    <label className="form-label">{lang === 'es' ? 'Precio Unitario ($)' : 'Unit Price ($)'}</label>
                     <input 
                       type="number" 
                       step="0.01" 
@@ -1071,7 +1118,7 @@ export default function App() {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Min Stock level</label>
+                    <label className="form-label">{t.labelMinStock}</label>
                     <input 
                       type="number" 
                       className="form-input" 
@@ -1082,21 +1129,21 @@ export default function App() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Category</label>
+                  <label className="form-label">{t.category}</label>
                   <select 
                     className="form-input" 
                     value={newProduct.category} 
                     onChange={e => setNewProduct({...newProduct, category: e.target.value})}
                     required
                   >
-                    <option value="">Select Category</option>
+                    <option value="">{lang === 'es' ? 'Seleccionar Categoría' : 'Select Category'}</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowProductModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create SKU</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowProductModal(false)}>{t.btnCancel}</button>
+                <button type="submit" className="btn btn-primary">{t.btnNewProduct}</button>
               </div>
             </form>
           </div>
@@ -1108,51 +1155,51 @@ export default function App() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h2>Record Stock Adjustment</h2>
+              <h2>{t.modalAdjustStock}</h2>
               <button className="modal-close" onClick={() => setShowAdjustModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleStockAdjustment}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">Select SKU</label>
+                  <label className="form-label">{lang === 'es' ? 'Seleccionar SKU' : 'Select SKU'}</label>
                   <select 
                     className="form-input" 
                     value={newAdjust.product}
                     onChange={e => setNewAdjust({...newAdjust, product: e.target.value})}
                     required
                   >
-                    <option value="">Select Product</option>
+                    <option value="">{t.phSelectProd}</option>
                     {products.map(p => <option key={p.id} value={p.id}>{p.sku} - {p.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Warehouse</label>
+                  <label className="form-label">{t.labelWarehouse}</label>
                   <select 
                     className="form-input" 
                     value={newAdjust.warehouse}
                     onChange={e => setNewAdjust({...newAdjust, warehouse: e.target.value})}
                     required
                   >
-                    <option value="">Select Warehouse</option>
+                    <option value="">{t.phSelectWh}</option>
                     {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                   </select>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
-                    <label className="form-label">Adjustment Type</label>
+                    <label className="form-label">{t.labelType}</label>
                     <select 
                       className="form-input" 
                       value={newAdjust.type}
                       onChange={e => setNewAdjust({...newAdjust, type: e.target.value})}
                       required
                     >
-                      <option value="IN">IN (Restock / Found)</option>
-                      <option value="OUT">OUT (Sales / Consumed)</option>
-                      <option value="ADJUSTMENT">ADJUSTMENT (Audit Correction)</option>
+                      <option value="IN">{lang === 'es' ? 'IN (Reabastecimiento / Hallazgo)' : 'IN (Restock / Found)'}</option>
+                      <option value="OUT">{lang === 'es' ? 'OUT (Venta / Consumido)' : 'OUT (Sales / Consumed)'}</option>
+                      <option value="ADJUSTMENT">{lang === 'es' ? 'ADJUSTMENT (Corrección de Auditoría)' : 'ADJUSTMENT (Audit Correction)'}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Quantity</label>
+                    <label className="form-label">{t.qty}</label>
                     <input 
                       type="number" 
                       min="1" 
@@ -1164,7 +1211,7 @@ export default function App() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Reference ID / Comments</label>
+                  <label className="form-label">{lang === 'es' ? 'ID Referencia / Comentarios' : 'Reference ID / Comments'}</label>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -1175,8 +1222,8 @@ export default function App() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowAdjustModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Process Adjustment</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAdjustModal(false)}>{t.btnCancel}</button>
+                <button type="submit" className="btn btn-primary">{lang === 'es' ? 'Procesar Ajuste' : 'Process Adjustment'}</button>
               </div>
             </form>
           </div>
@@ -1188,51 +1235,51 @@ export default function App() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h2>Initiate Warehouse Stock Transfer</h2>
+              <h2>{t.modalNewTransfer}</h2>
               <button className="modal-close" onClick={() => setShowTransferModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleStockTransfer}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">Select SKU</label>
+                  <label className="form-label">{lang === 'es' ? 'Seleccionar SKU' : 'Select SKU'}</label>
                   <select 
                     className="form-input" 
                     value={newTransfer.product}
                     onChange={e => setNewTransfer({...newTransfer, product: e.target.value})}
                     required
                   >
-                    <option value="">Select Product</option>
+                    <option value="">{t.phSelectProd}</option>
                     {products.map(p => <option key={p.id} value={p.id}>{p.sku} - {p.name}</option>)}
                   </select>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
-                    <label className="form-label">From Warehouse</label>
+                    <label className="form-label">{t.labelFromWh}</label>
                     <select 
                       className="form-input" 
                       value={newTransfer.from_wh}
                       onChange={e => setNewTransfer({...newTransfer, from_wh: e.target.value})}
                       required
                     >
-                      <option value="">Source</option>
+                      <option value="">{lang === 'es' ? 'Origen' : 'Source'}</option>
                       {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">To Warehouse</label>
+                    <label className="form-label">{t.labelToWh}</label>
                     <select 
                       className="form-input" 
                       value={newTransfer.to_wh}
                       onChange={e => setNewTransfer({...newTransfer, to_wh: e.target.value})}
                       required
                     >
-                      <option value="">Destination</option>
+                      <option value="">{lang === 'es' ? 'Destino' : 'Destination'}</option>
                       {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Transfer Quantity</label>
+                  <label className="form-label">{lang === 'es' ? 'Cantidad a Transferir' : 'Transfer Quantity'}</label>
                   <input 
                     type="number" 
                     min="1" 
@@ -1244,8 +1291,8 @@ export default function App() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowTransferModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Process Transfer</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowTransferModal(false)}>{t.btnCancel}</button>
+                <button type="submit" className="btn btn-primary">{lang === 'es' ? 'Procesar Transferencia' : 'Process Transfer'}</button>
               </div>
             </form>
           </div>
@@ -1257,14 +1304,14 @@ export default function App() {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '650px' }}>
             <div className="modal-header">
-              <h2>Draft Purchase Order</h2>
+              <h2>{t.modalNewPO}</h2>
               <button className="modal-close" onClick={() => setShowPOModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleCreatePO}>
               <div className="modal-body" style={{ maxHeight: '420px', overflowY: 'auto' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
-                    <label className="form-label">PO Number</label>
+                    <label className="form-label">{lang === 'es' ? 'Nro PO' : 'PO Number'}</label>
                     <input 
                       type="text" 
                       className="form-input" 
@@ -1274,14 +1321,14 @@ export default function App() {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Supplier</label>
+                    <label className="form-label">{t.supplier}</label>
                     <select 
                       className="form-input" 
                       value={newPO.supplier}
                       onChange={e => setNewPO({...newPO, supplier: e.target.value})}
                       required
                     >
-                      <option value="">Select Supplier</option>
+                      <option value="">{t.phSelectSupplier}</option>
                       {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
@@ -1289,9 +1336,9 @@ export default function App() {
 
                 <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Items List</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{lang === 'es' ? 'Lista de Ítems' : 'Items List'}</span>
                     <button type="button" className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem' }} onClick={addPOItemRow}>
-                      <Plus size={12} /> Add Row
+                      <Plus size={12} /> {lang === 'es' ? 'Añadir Fila' : 'Add Row'}
                     </button>
                   </div>
 
@@ -1303,12 +1350,12 @@ export default function App() {
                         onChange={e => updatePOItemRow(idx, 'product', e.target.value)}
                         required
                       >
-                        <option value="">Product SKU</option>
+                        <option value="">{lang === 'es' ? 'SKU del Producto' : 'Product SKU'}</option>
                         {products.map(p => <option key={p.id} value={p.id}>{p.sku} - {p.name}</option>)}
                       </select>
                       <input 
                         type="number" 
-                        placeholder="Qty" 
+                        placeholder={lang === 'es' ? 'Cant' : 'Qty'} 
                         className="form-input" 
                         value={row.qty}
                         onChange={e => updatePOItemRow(idx, 'qty', e.target.value)}
@@ -1317,7 +1364,7 @@ export default function App() {
                       <input 
                         type="number" 
                         step="0.01" 
-                        placeholder="Cost price" 
+                        placeholder={lang === 'es' ? 'Precio Costo' : 'Cost price'} 
                         className="form-input" 
                         value={row.price}
                         onChange={e => updatePOItemRow(idx, 'price', e.target.value)}
@@ -1328,8 +1375,8 @@ export default function App() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowPOModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Draft</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowPOModal(false)}>{t.btnCancel}</button>
+                <button type="submit" className="btn btn-primary">{lang === 'es' ? 'Guardar Borrador' : 'Save Draft'}</button>
               </div>
             </form>
           </div>
