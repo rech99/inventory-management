@@ -643,12 +643,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginCard: {
-    width: width * 0.88,
-    backgroundColor: '#040814', /* Deep Midnight Blue/Black */
-    borderRadius: 0, /* Hard square */
-    padding: 24,
+    width: width - 40,
+    maxWidth: 360,
+    backgroundColor: '#080d1a', /* Deep Space Dark */
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.35)', /* Teal active hairline */
+    borderColor: 'rgba(6, 182, 212, 0.35)', /* Cyan active hairline */
+    padding: 30,
   },
   loginHeader: {
     alignItems: 'center',
@@ -659,23 +659,21 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 0, /* Sharp Edge */
     borderWidth: 1,
-    borderColor: '#14b8a6', /* Teal Accent */
+    borderColor: '#06b6d4', /* Cyan Accent */
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   logoText: {
-    color: '#14b8a6',
+    color: '#06b6d4',
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     fontSize: 20,
   },
   loginTitle: {
     fontSize: 20,
     fontWeight: '900',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    color: '#f0fdfa',
+    color: '#fff',
     letterSpacing: 1,
   },
   loginSubtitle: {
@@ -700,7 +698,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: 'rgba(255,255,255,0.01)',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     color: '#f0fdfa',
     paddingHorizontal: 12,
@@ -718,7 +716,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 0,
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
   },
   hostBtnText: {
     color: '#9ca3af',
@@ -727,7 +725,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   btnPrimary: {
-    backgroundColor: '#14b8a6', /* Primary action is Teal */
+    backgroundColor: '#06b6d4', /* Primary action is Cyan */
     borderRadius: 0,
     paddingVertical: 12,
     alignItems: 'center',
@@ -754,13 +752,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '900',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    color: '#f0fdfa',
+    color: '#fff',
     letterSpacing: 0.5,
   },
   headerSubtitle: {
@@ -774,13 +771,13 @@ const styles = StyleSheet.create({
   syncBtn: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#14b8a6',
+    borderColor: '#06b6d4',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 0,
   },
   syncText: {
-    color: '#14b8a6',
+    color: '#06b6d4',
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -796,15 +793,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    color: '#f0fdfa',
+    color: '#fff',
     marginBottom: 16,
     letterSpacing: 0.5,
   },
   subSectionTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     color: '#f3f4f6',
     marginTop: 24,
     marginBottom: 12,
@@ -817,7 +812,7 @@ const styles = StyleSheet.create({
     gap: 0,
     borderLeftWidth: 1,
     borderTopWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     marginBottom: 0,
   },
   statCard: {
@@ -827,7 +822,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRightWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
   },
   statCardAlert: {
     backgroundColor: 'rgba(239, 68, 68, 0.05)',
@@ -843,8 +838,8 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 22,
     fontWeight: '800',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    color: '#f0fdfa',
+    fontFamily: Platform.OS === 'ios' ? 'Courier-Bold' : 'monospace',
+    color: '#fff',
     marginTop: 6,
   },
 
@@ -887,7 +882,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.12)',
+    borderColor: 'rgba(6, 182, 212, 0.12)',
     borderRadius: 0,
     paddingVertical: 12,
     paddingHorizontal: 4,
@@ -919,7 +914,7 @@ const styles = StyleSheet.create({
   searchBar: {
     backgroundColor: 'rgba(255,255,255,0.01)',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     color: '#fff',
     paddingHorizontal: 12,
@@ -930,7 +925,7 @@ const styles = StyleSheet.create({
   productCard: {
     backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     paddingVertical: 16,
     paddingHorizontal: 4,
@@ -941,10 +936,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   productSku: {
-    color: '#14b8a6',
+    color: '#06b6d4',
     fontWeight: 'bold',
     fontSize: 12,
     letterSpacing: 0.5,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   productPrice: {
     color: '#fff',
@@ -954,7 +950,6 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 15,
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     color: '#fff',
     marginTop: 4,
   },
@@ -967,7 +962,7 @@ const styles = StyleSheet.create({
   stockBreakdown: {
     marginTop: 12,
     borderTopWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.08)',
+    borderColor: 'rgba(6, 182, 212, 0.08)',
     paddingTop: 10,
   },
   stockBreakdownTitle: {
@@ -1002,7 +997,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.08)',
+    borderColor: 'rgba(6, 182, 212, 0.08)',
     paddingTop: 8,
     marginTop: 6,
   },
@@ -1021,14 +1016,14 @@ const styles = StyleSheet.create({
   adjustShortcutBtn: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.3)',
+    borderColor: 'rgba(6, 182, 212, 0.3)',
     borderRadius: 0,
     paddingVertical: 8,
     alignItems: 'center',
     marginTop: 14,
   },
   adjustShortcutText: {
-    color: '#14b8a6',
+    color: '#06b6d4',
     fontSize: 10,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -1057,15 +1052,15 @@ const styles = StyleSheet.create({
   skuSelectBtn: {
     backgroundColor: '#000000',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     paddingVertical: 6,
     paddingHorizontal: 12,
     marginRight: 8,
   },
   skuSelectBtnActive: {
-    borderColor: '#14b8a6',
-    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+    borderColor: '#06b6d4',
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
   },
   skuSelectText: {
     color: '#9ca3af',
@@ -1076,7 +1071,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   scanActionBtn: {
-    backgroundColor: '#14b8a6',
+    backgroundColor: '#06b6d4',
     borderRadius: 0,
     paddingVertical: 12,
     alignItems: 'center',
@@ -1093,7 +1088,7 @@ const styles = StyleSheet.create({
     height: 160,
     backgroundColor: '#000000',
     borderWidth: 1,
-    borderColor: '#14b8a6',
+    borderColor: '#06b6d4',
     borderRadius: 0,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1102,7 +1097,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   cameraText: {
-    color: 'rgba(20, 184, 166, 0.4)',
+    color: 'rgba(6, 182, 212, 0.4)',
     fontSize: 10,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -1117,7 +1112,7 @@ const styles = StyleSheet.create({
   scanResultsCard: {
     backgroundColor: '#000000',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     padding: 16,
   },
@@ -1131,7 +1126,6 @@ const styles = StyleSheet.create({
   scanResultName: {
     color: '#fff',
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     fontSize: 16,
     marginTop: 6,
   },
@@ -1142,20 +1136,20 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(20, 184, 166, 0.08)',
+    backgroundColor: 'rgba(6, 182, 212, 0.08)',
     marginVertical: 14,
   },
   whOptionBtn: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     paddingVertical: 6,
     paddingHorizontal: 12,
   },
   whOptionBtnActive: {
-    borderColor: '#14b8a6',
-    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+    borderColor: '#06b6d4',
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
   },
   whOptionText: {
     color: '#9ca3af',
@@ -1192,7 +1186,7 @@ const styles = StyleSheet.create({
   poCard: {
     backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     borderRadius: 0,
     paddingVertical: 16,
     paddingHorizontal: 4,
@@ -1207,7 +1201,7 @@ const styles = StyleSheet.create({
   poNumber: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#14b8a6',
+    color: '#06b6d4',
   },
   poStatusText: {
     fontSize: 11,
@@ -1231,7 +1225,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     padding: 10,
     borderWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.08)',
+    borderColor: 'rgba(6, 182, 212, 0.08)',
   },
   poItemsTitle: {
     fontSize: 10,
@@ -1287,7 +1281,7 @@ const styles = StyleSheet.create({
     height: 56,
     backgroundColor: '#000000',
     borderTopWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 8,
@@ -1306,13 +1300,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tabLabelActive: {
-    color: '#14b8a6',
+    color: '#06b6d4',
     fontWeight: 'bold',
   },
   tabBtnLogout: {
     paddingHorizontal: 12,
     borderLeftWidth: 1,
-    borderColor: 'rgba(20, 184, 166, 0.18)',
+    borderColor: 'rgba(6, 182, 212, 0.18)',
     justifyContent: 'center',
   },
   tabLabelLogout: {

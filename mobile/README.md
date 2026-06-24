@@ -1,56 +1,56 @@
-# Welcome to your Expo app 👋
+# Mobile App - Operación de Almacenes (G-Inventory)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+La aplicación móvil es un cliente de almacén desarrollado con **Expo** y **React Native**. Su propósito es permitir a los operarios auditar existencias físicas en tiempo real, simular escaneos de códigos de barra mediante animaciones visuales, y recibir/comprobar órdenes de compra (POs) directamente desde el suelo del depósito.
 
-## Get started
+---
 
-1. Install dependencies
+## 🛠️ Stack Tecnológico
+* **Framework**: Expo (React Native) + TypeScript
+* **Peticiones HTTP**: Axios
+* **Estructura**: Expo Router (Estructura basada en archivos)
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## 🚀 Guía de Instalación y Ejecución
 
-   ```bash
-   npx expo start
-   ```
+Sigue estos pasos en tu terminal desde el directorio `mobile/`:
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Instalar Dependencias
+Instala los paquetes necesarios en el directorio móvil:
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Iniciar el Servidor de Expo
+Levanta el CLI de desarrollo de Expo:
+```bash
+npm run start
+```
+* Presiona `a` para abrir el emulador de Android (si está configurado).
+* Presiona `i` para abrir el simulador de iOS (si usas macOS).
+* Escanea el código QR desde tu teléfono físico mediante la app de Expo Go (Android) o la cámara de iOS.
 
-### Other setup steps
+---
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## 📡 Configuración del Servidor (API Host)
 
-## Learn more
+Debido a cómo los emuladores y dispositivos móviles manejan las direcciones de red, **no siempre** puedes usar `localhost` para conectar la app móvil con el backend de Django:
 
-To learn more about developing your project with Expo, look at the following resources:
+1. **Emulador de Android**: Cambia la dirección del servidor en la pantalla de login de la app a:
+   ```text
+   10.0.2.2:8000
+   ```
+2. **Simulador de iOS**: Puedes usar:
+   ```text
+   localhost:8000
+   ```
+3. **Dispositivo Celular Físico**: Debes ingresar la dirección IP local de tu computadora en la red Wi-Fi (ejemplo: `192.168.1.15:8000`) y asegurarte de que tu teléfono y tu PC compartan la misma red.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🔍 Simulador de Escáner de Barra
+Para evitar bloqueos y fallos del hardware de cámara nativo dentro de entornos emulados, la aplicación cuenta con un simulador visual:
+* Permite seleccionar o teclear un SKU para simular el disparo del láser de escaneo.
+* Dispara una animación visual de barrido láser (`scanBeam`).
+* Permite al operario registrar entradas/salidas inmediatas asociadas al depósito elegido.
+* Emite un aviso en tiempo real que actualiza inmediatamente el panel web de analíticas.

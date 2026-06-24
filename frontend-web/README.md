@@ -1,32 +1,55 @@
-# React + TypeScript + Vite
+# Frontend Web - Panel de Analíticas (G-Inventory)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Este es el cliente web de administración para el sistema de control de inventarios. Está desarrollado como una Single Page Application (SPA) ultrarrápida usando **Vite**, **React**, y **TypeScript**, estilizada con CSS puro adaptando un diseño técnico de alto contraste **OLED Dark Mode**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Stack Tecnológico
+* **Build Tool**: Vite
+* **Librería**: React 19 + TypeScript
+* **Iconografía**: Lucide React
+* **Peticiones HTTP**: Axios
+* **Comunicación en Tiempo Real**: WebSocket nativo de navegador
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Guía de Instalación y Ejecución
 
-## Expanding the Oxlint configuration
+Sigue estos pasos en tu terminal desde el directorio `frontend-web/`:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### 1. Instalar Módulos de Node
+Descarga e instala todas las dependencias del proyecto:
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Iniciar el Servidor de Desarrollo
+Levanta el servidor local de Vite:
+```bash
+npm run dev
+```
+
+El servidor se iniciará normalmente en:
+* **Local**: `http://localhost:5173/` (o `http://localhost:5174/` si el puerto base está en uso).
+
+---
+
+## ⚙️ Configuración de API e Integración
+* **Endpoints HTTP**: El frontend se comunica con el servidor local del backend a través del endpoint base configurado en `src/App.tsx` en la variable:
+  ```typescript
+  const API_BASE = 'http://localhost:8000/api';
+  ```
+* **WebSocket**: Para las notificaciones en tiempo real (alertas de stock bajo, movimientos), el frontend abre una conexión persistente a:
+  ```typescript
+  ws://localhost:8000/ws/stock/
+  ```
+
+---
+
+## 🎨 Sistema de Diseño y Tipografía
+La web sigue las especificaciones estéticas de la guía de diseño del proyecto:
+* **Tipografía**:
+  * Títulos y Branding: `Outfit`
+  * Textos y Formularios: `Inter`
+  * Precios, Cantidades y SKUs: `JetBrains Mono`
+* **Estilo**: Bordes angulares planos de precisión de 1px (`border-radius: 0`), fondo OLED negro profundo (`#000000`) y acentos en celeste/cian vibrantes.

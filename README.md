@@ -1,92 +1,106 @@
-# Real-Time Inventory Management System
+# Sistema de Gestión de Inventarios en Tiempo Real (G-Inventory)
 
-A full-stack, real-time inventory management solution comprising a **Django REST API backend** with **Django Channels (WebSockets)**, a **React Web Dashboard**, and a **React Native Mobile App** (built with Expo).
+G-Inventory es una solución full-stack y de alta precisión para el control de inventarios en tiempo real. Está compuesta por un **Backend API REST en Django** (con soporte WebSocket mediante **Django Channels / Daphne**), un **Panel de Control Web en React (Vite)** y una **Aplicación Móvil en React Native (Expo)**.
 
-## 📂 Project Structure
-
-* **`backend/`** - Django REST framework + Channels. Handles authentication (SimpleJWT), stock models, warehouse routing, purchase order management, and WebSocket broadcasts.
-* **`frontend-web/`** - React + Vite + TypeScript. Custom dark-theme web dashboard with responsive grids, category analytics charts, live update streams, PO management, and stock adjustments.
-* **`mobile/`** - Expo React Native + TypeScript. Pocket client featuring server host selection, simulated barcode scanner, stock level lookups, and purchase order fulfillment.
+El diseño sigue una estética técnica **OLED Dark Mode** de alta precisión con bordes angulares planos, alta legibilidad y alineaciones tabulares numéricas.
 
 ---
 
-## 🔐 Credentials (Seeded Data)
+## 📂 Estructura del Proyecto
 
-Running the data seeding script creates the default admin user:
-* **Username**: `admin`
-* **Password**: `adminpass`
+* **`backend/`**: API REST en Django + Django Channels. Administra la lógica de negocio, autenticación JWT, registros históricos de transacciones, ordenes de compra (POs) y transmisión de eventos WebSocket en tiempo real.
+* **`frontend-web/`**: Panel administrativo SPA construido con React + Vite + TypeScript. Permite visualizar analíticas, gestionar el stock, aprobar órdenes de compra, y ver actualizaciones en tiempo real gracias a conexiones WebSocket.
+* **`mobile/`**: Aplicación de almacén en React Native con Expo. Permite a los operarios escanear SKUs de forma simulada, registrar movimientos rápidos de stock e ingresar la recepción física de mercancías asociadas a órdenes de compra.
+* **`design-system/`**: Carpeta que contiene las guías de estilos, colores, tipografía e identidad visual de G-Inventory ([MASTER.md](design-system/g-inventory/MASTER.md)).
 
 ---
 
-## 🚀 Execution Guide
+## 🚀 Guía de Inicio Rápido
 
-Follow these steps to run all three applications locally:
+### Prerrequisitos
+* **Python** (versión 3.12 recomendada)
+* **Node.js** (versión 18 o superior recomendada)
 
-### 1. Django API Backend
-Open a terminal in the project root folder:
+---
+
+### 1. Servidor Backend (Django)
+Navega a la carpeta [backend](file:///C:/Users/USER/documents/github/inventory-management/backend):
 ```powershell
-# Navigate to backend directory
 cd backend
 
-# (Optional - already done) Activate virtual environment
-.\venv\Scripts\Activate.ps1
+# Crear entorno virtual e instalar dependencias
+py -3.12 -m venv venv
+.\venv\Scripts\activate.ps1
+pip install -r requirements.txt
 
-# Run the Django migrations & seed initial database values (if not already done)
-python manage.py migrate
-python manage.py seed_data
+# Aplicar migraciones y sembrar base de datos SQLite de prueba
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py seed_data
 
-# Start the Daphne ASGI development server
-python manage.py runserver 0.0.0.0:8000
+# Iniciar servidor de desarrollo en puerto 8000
+.\venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
 ```
-The server will boot at `http://localhost:8000/`. Real-time WebSockets will listen at `ws://localhost:8000/ws/inventory/updates/`.
+* HTTP: `http://localhost:8000/api`
+* WebSockets: `ws://localhost:8000/ws/stock/`
 
 ---
 
-### 2. React Web Frontend
-Open a new terminal in the project root:
-```powershell
-# Navigate to web dashboard
+### 2. Panel Web (React)
+Navega a la carpeta [frontend-web](file:///C:/Users/USER/documents/github/inventory-management/frontend-web):
+```bash
 cd frontend-web
 
-# Install dependencies (if not done)
+# Instalar dependencias e iniciar servidor de desarrollo
 npm install
-
-# Start Vite dev server
 npm run dev
 ```
-Open your browser to the URL printed in the terminal (usually `http://localhost:5173/`).
+* Acceso local: `http://localhost:5173/`
 
 ---
 
-### 3. Expo Mobile App
-Open a new terminal in the project root:
-```powershell
-# Navigate to mobile app
+### 3. Aplicación Móvil (Expo)
+Navega a la carpeta [mobile](file:///C:/Users/USER/documents/github/inventory-management/mobile):
+```bash
 cd mobile
 
-# Start the Expo developer tool
+# Instalar dependencias e iniciar CLI de Expo
+npm install
 npm run start
 ```
-* Press **`w`** to run the app in the browser (web mode).
-* Scan the QR code with the **Expo Go** app on your physical iOS/Android device to run it directly on your phone.
-* Press **`a`** to run on an Android Emulator (configure server host input in the login card to `10.0.2.2:8000`).
-* Press **`i`** to run on an iOS Simulator (configure server host input in the login card to `localhost:8000`).
+* Presiona `a` para emulador de Android (Host IP recomendado: `10.0.2.2:8000`).
+* Presiona `i` para simulador de iOS (Host IP recomendado: `localhost:8000`).
+* Escanea el código QR mediante la aplicación **Expo Go** para pruebas en dispositivos físicos conectados a la misma red Wi-Fi de tu computadora.
 
 ---
 
-## ⚡ Core Workflows
+## 🔐 Credenciales de Prueba (Sembradas en SQLite)
 
-1. **Dashboard Overview**: Access the React web dashboard. The custom SVG chart shows product counts per category, while warehouse indicators display physical fill levels.
-2. **Restocking via PO**:
-   * Create a new Purchase Order in the Web Dashboard (PO will start as `PENDING`).
-   * Change the status to `APPROVED` in the orders table.
-   * On the mobile app (or web dashboard), select the PO and click **Receive Stock**.
-   * The backend automatically records transaction logs (`IN`), updates the product stock records, and sends a WebSocket event.
-   * The web dashboard immediately updates the stock counters, total valuation, and logs list with a green highlight glow.
-3. **Warehouse Stock Transfers**:
-   * Click **Initiate Transfer** on the web dashboard (or use the simulated scan tool on mobile).
-   * Transfer units of a product from "Main Warehouse" to "Secondary Depot".
-   * The system logs a `TRANSFER` transaction and decreases/increases stock levels atomically.
-4. **Safety Alerts**:
-   * If stock falls below a product's defined `min_stock_level` (due to a sale/usage `OUT` transaction), the backend broadcasts a `LOW_STOCK_ALERT` via WebSockets.
-   * A warning banner/feed entry lights up red on both the web and mobile screens instantly.
+La base de datos SQLite local (`backend/db.sqlite3`) se inicializa con los siguientes usuarios de prueba:
+
+| Usuario | Contraseña | Rol / Permisos |
+| :--- | :--- | :--- |
+| **`admin`** | `adminpass` | Superusuario (Administrador General) |
+| **`manager`** | `managerpass` | Manager de Almacén (Aprobación y Recepción) |
+| **`staff`** | `staffpass` | Auditor / Operario de Almacén |
+
+---
+
+## 🎨 Especificación Estética (Aesthetic Tech Moderno)
+* **Tipografía**:
+  * Títulos principales y de sección: **Outfit**
+  * Textos descriptivos e interfaces: **Inter**
+  * Códigos SKU, fechas, cantidades y precios: **JetBrains Mono**
+* **Estilo Visual**: Temática OLED negra pura (`#000000`) con bordes planos de 1px (`border-radius: 0`) y acentos en tonos cian y celeste cian, optimizados para paneles de control de alto contraste.
+
+---
+
+## 🔄 Flujos Operativos Principales
+1. **Recepción de Mercadería por Orden de Compra**:
+   * Genera una nueva Orden de Compra (PO) en estado `PENDING` desde el panel web.
+   * Cambia su estado a `APPROVED`.
+   * Abre la aplicación móvil y pulsa en **Receive Stock** sobre esa PO.
+   * La app móvil registrará la transacción de entrada, y el backend actualizará la base de datos SQLite y emitirá una señal WebSocket.
+   * El panel web de analíticas recibirá la actualización instantáneamente en caliente, mostrando el aumento de unidades con un efecto de destello cian.
+2. **Alertas de Stock Bajo**:
+   * Si la cantidad disponible de algún producto cae por debajo de su límite mínimo (`min_stock_level`), el backend emite un evento `LOW_STOCK_ALERT`.
+   * Ambos paneles (web y móvil) iluminarán de color rojo las alertas de inventario.

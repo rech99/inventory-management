@@ -18,24 +18,25 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#0F766E` | `--color-primary` |
-| Secondary | `#14B8A6` | `--color-secondary` |
-| CTA/Accent | `#0369A1` | `--color-cta` |
-| Background | `#F0FDFA` | `--color-background` |
-| Text | `#134E4A` | `--color-text` |
+| Primary | `#06B6D4` | `--color-primary` |
+| Secondary | `#38BDF8` | `--color-secondary` |
+| CTA/Accent | `#0EA5E9` | `--color-cta` |
+| Background | `#000000` | `--color-background` |
+| Text | `#FFFFFF` | `--color-text` |
 
-**Color Notes:** Trust teal + professional blue
+**Color Notes:** Precision dark OLED cyan and sky blue with pure whites
 
 ### Typography
 
-- **Heading Font:** Cinzel
-- **Body Font:** Josefin Sans
-- **Mood:** real estate, luxury, elegant, sophisticated, property, premium
-- **Google Fonts:** [Cinzel + Josefin Sans](https://fonts.google.com/share?selection.family=Cinzel:wght@400;500;600;700|Josefin+Sans:wght@300;400;500;600;700)
+- **Heading Font:** Outfit
+- **Body Font:** Inter
+- **Data Font:** JetBrains Mono
+- **Mood:** high-precision, technical, modern, oled dark, clean dashboard
+- **Google Fonts:** [Outfit + Inter + JetBrains Mono](https://fonts.google.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)
 
 **CSS Import:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 ```
 
 ### Spacing Variables
