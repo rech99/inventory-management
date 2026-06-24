@@ -22,3 +22,7 @@ backend/db.sqlite3
 .DS_Store
 Thumbs.db
 *.log
+
+# Custom Skills and Agents folders
+.agent/
+.agents/
