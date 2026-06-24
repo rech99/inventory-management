@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   LayoutDashboard, 
@@ -10,15 +10,10 @@ import {
   AlertTriangle, 
   Bell, 
   LogOut, 
-  User as UserIcon, 
-  Warehouse as WhIcon, 
   DollarSign, 
   TrendingUp, 
   Layers,
-  ArrowUpRight,
-  ArrowDownLeft,
   X,
-  FileText,
   Truck
 } from 'lucide-react';
 import { translations } from './translations';
@@ -127,12 +122,6 @@ export default function App() {
   });
   
   const t = translations[lang];
-
-  const toggleLanguage = () => {
-    const nextLang = lang === 'es' ? 'en' : 'es';
-    setLang(nextLang);
-    localStorage.setItem('app_lang', nextLang);
-  };
   
   // Dashboard & Navigation state
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'transfers'>('dashboard');
@@ -605,19 +594,9 @@ export default function App() {
               <span className="user-role">{t.role}</span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button 
-              onClick={toggleLanguage} 
-              className="modal-close" 
-              style={{ fontSize: '0.7rem', fontWeight: 'bold', border: '1px solid var(--border-hairline)', padding: '2px 6px', color: 'var(--primary)', cursor: 'pointer' }}
-              title={lang === 'es' ? 'Switch to English' : 'Cambiar a Español'}
-            >
-              {lang === 'es' ? 'EN' : 'ES'}
-            </button>
-            <button onClick={handleLogout} className="modal-close" title={t.logout}>
-              <LogOut size={18} />
-            </button>
-          </div>
+          <button onClick={handleLogout} className="modal-close" title={t.logout}>
+            <LogOut size={18} />
+          </button>
         </div>
       </aside>
 
@@ -634,6 +613,40 @@ export default function App() {
             <div className="realtime-badge">
               <div className="pulse-dot"></div>
               <span>{lang === 'es' ? 'Actualizaciones en Vivo' : 'Live Updates Active'}</span>
+            </div>
+            <div className="lang-selector-group" style={{ display: 'flex', gap: '0px', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+              <button 
+                onClick={() => { setLang('es'); localStorage.setItem('app_lang', 'es'); }}
+                style={{
+                  background: lang === 'es' ? 'var(--primary)' : 'transparent',
+                  color: lang === 'es' ? '#000000' : 'var(--text-secondary)',
+                  border: 'none',
+                  padding: '6px 12px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  borderRadius: 0,
+                  transition: 'var(--transition-fast)'
+                }}
+              >
+                ES
+              </button>
+              <button 
+                onClick={() => { setLang('en'); localStorage.setItem('app_lang', 'en'); }}
+                style={{
+                  background: lang === 'en' ? 'var(--primary)' : 'transparent',
+                  color: lang === 'en' ? '#000000' : 'var(--text-secondary)',
+                  border: 'none',
+                  padding: '6px 12px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  borderRadius: 0,
+                  transition: 'var(--transition-fast)'
+                }}
+              >
+                EN
+              </button>
             </div>
             {activeTab === 'products' && (
               <>
@@ -863,7 +876,12 @@ export default function App() {
                               <span key={s.id} style={{ fontSize: '0.75rem' }}>
                                 🏢 {s.warehouse_name}: <strong>{s.quantity}</strong>
                               </span>
-                                               {p.stocks.length === 0 && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{lang === 'es' ? 'Sin stock en depósito' : 'No warehouse stock'}</span>}
+                            ))}
+                            {p.stocks.length === 0 && (
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                {lang === 'es' ? 'Sin stock en depósito' : 'No warehouse stock'}
+                              </span>
+                            )}
                           </div>
                         </td>
                         <td>
@@ -890,7 +908,7 @@ export default function App() {
                         {t.emptyProducts}
                       </td>
                     </tr>
-                  )}             )}
+                  )}
                 </tbody>
               </table>
             </div>
