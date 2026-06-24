@@ -1,5 +1,9 @@
-# Virtual Environment
+# Virtual Environments
+venv/
+.venv/
 backend/venv/
+**/venv/
+**/.venv/
 backend/__pycache__/
 *.pyc
 
