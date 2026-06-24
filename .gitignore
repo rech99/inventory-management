@@ -1,0 +1,20 @@
+# Virtual Environment
+backend/venv/
+backend/__pycache__/
+*.pyc
+
+# Local Database
+backend/db.sqlite3
+
+# Node Dependencies
+**/node_modules/
+**/dist/
+**/.expo/
+**/web-build/
+
+# Editor/OS settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
