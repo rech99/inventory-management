@@ -792,7 +792,9 @@ export default function App() {
                   })}
                 </div>
               </div>
-                        {/* Right Column: Recent Activities + Critical Alerts */}
+            </div>
+            
+            {/* Right Column: Recent Activities + Critical Alerts */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
               {/* Recent Activities Feed */}
               <div className="card" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '320px' }}>
@@ -870,7 +872,6 @@ export default function App() {
                 </div>
               </div>
             </div>
-    </div>
           </div>
         )}
 
