@@ -145,6 +145,7 @@ export default function App() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showPOModal, setShowPOModal] = useState(false);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // Form values
   const [newProduct, setNewProduct] = useState({ sku: '', name: '', description: '', price: '', category: '', min_stock: '10' });
@@ -402,6 +403,16 @@ export default function App() {
     } catch (err: any) {
       alert('Error updating PO: ' + JSON.stringify(err.response?.data || err.message));
     }
+  };
+
+  // Quick reorder handler from low stock dashboard widget
+  const handleQuickReorder = (product: Product) => {
+    setNewPO({
+      supplier: suppliers.length > 0 ? String(suppliers[0].id) : '',
+      order_number: 'PO-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000)),
+      items: [{ product: String(product.id), qty: String(product.min_stock_level * 2), price: String(product.price) }]
+    });
+    setShowPOModal(true);
   };
 
   // Handle create Purchase Order
@@ -767,47 +778,85 @@ export default function App() {
                   })}
                 </div>
               </div>
-            </div>
-
-            {/* Recent Activities Feed */}
-            <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="card-title">{t.recentMovementsTitle}</div>
-              <div className="log-list" style={{ flexGrow: 1, overflowY: 'auto' }}>
-                {analytics.recent_transactions.map((tx: any) => (
-                  <div key={tx.id} className="log-item">
-                    <div className="log-details">
-                      <span className="log-title">{tx.product_name}</span>
-                      <span className="log-meta">
-                        {tx.warehouse_name} • {new Date(tx.created_at).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span className={`badge ${
-                        tx.type === 'IN' ? 'badge-in' : 
-                        tx.type === 'OUT' ? 'badge-out' : 
-                        tx.type === 'TRANSFER' ? 'badge-transfer' : 'badge-adjustment'
-                      }`}>
-                        {tx.type === 'IN' ? t.badgeIn : 
-                         tx.type === 'OUT' ? t.badgeOut : 
-                         tx.type === 'TRANSFER' ? t.badgeTransfer : t.badgeAdjustment}
-                      </span>
-                      <div className="log-qty" style={{ 
-                        color: tx.type === 'IN' ? 'var(--success)' : 
-                               tx.type === 'OUT' ? 'var(--danger)' : 'inherit',
-                        marginTop: '4px'
-                      }}>
-                        {tx.type === 'IN' ? '+' : tx.type === 'OUT' ? '-' : ''}{tx.quantity}
+                        {/* Right Column: Recent Activities + Critical Alerts */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+              {/* Recent Activities Feed */}
+              <div className="card" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '320px' }}>
+                <div className="card-title">{t.recentMovementsTitle}</div>
+                <div className="log-list" style={{ flexGrow: 1, overflowY: 'auto' }}>
+                  {analytics.recent_transactions.map((tx: any) => (
+                    <div key={tx.id} className="log-item">
+                      <div className="log-details">
+                        <span className="log-title">{tx.product_name}</span>
+                        <span className="log-meta">
+                          {tx.warehouse_name} • {new Date(tx.created_at).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span className={`badge ${
+                          tx.type === 'IN' ? 'badge-in' : 
+                          tx.type === 'OUT' ? 'badge-out' : 
+                          tx.type === 'TRANSFER' ? 'badge-transfer' : 'badge-adjustment'
+                        }`}>
+                          {tx.type === 'IN' ? t.badgeIn : 
+                           tx.type === 'OUT' ? t.badgeOut : 
+                           tx.type === 'TRANSFER' ? t.badgeTransfer : t.badgeAdjustment}
+                        </span>
+                        <div className="log-qty" style={{ 
+                          color: tx.type === 'IN' ? 'var(--success)' : 
+                                 tx.type === 'OUT' ? 'var(--danger)' : 'inherit',
+                          marginTop: '4px'
+                        }}>
+                          {tx.type === 'IN' ? '+' : tx.type === 'OUT' ? '-' : ''}{tx.quantity}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {analytics.recent_transactions.length === 0 && (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>
-                    {t.noMovements}
-                  </div>
-                )}
+                  ))}
+                  {analytics.recent_transactions.length === 0 && (
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>
+                      {t.noMovements}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Critical Stock Alerts Card */}
+              <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: '260px' }}>
+                <div className="card-title" style={{ borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                  <span style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    ⚠️ {lang === 'es' ? 'Alertas de Stock Crítico' : 'Critical Stock Alerts'}
+                  </span>
+                  <span className="badge badge-cancelled">
+                    {products.filter(p => p.total_quantity <= p.min_stock_level).length}
+                  </span>
+                </div>
+                <div className="log-list" style={{ flexGrow: 1, overflowY: 'auto', maxHeight: '280px' }}>
+                  {products.filter(p => p.total_quantity <= p.min_stock_level).map(p => (
+                    <div key={p.id} className="log-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                      <div className="log-details">
+                        <span className="log-title" style={{ color: 'var(--danger)', fontWeight: '600' }}>{p.name}</span>
+                        <span className="log-meta">
+                          SKU: {p.sku} • {lang === 'es' ? `Stock: ${p.total_quantity} / Mín: ${p.min_stock_level}` : `Stock: ${p.total_quantity} / Min: ${p.min_stock_level}`}
+                        </span>
+                      </div>
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ padding: '6px 12px', fontSize: '0.7rem', backgroundColor: 'var(--danger)', color: '#000', border: '1px solid var(--danger)', fontWeight: 'bold' }}
+                        onClick={() => handleQuickReorder(p)}
+                      >
+                        {lang === 'es' ? 'Reordenar' : 'Reorder'}
+                      </button>
+                    </div>
+                  ))}
+                  {products.filter(p => p.total_quantity <= p.min_stock_level).length === 0 && (
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '40px 0' }}>
+                      {lang === 'es' ? '✅ Todo el stock está en niveles seguros.' : '✅ All stock levels are safe.'}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+    </div>
           </div>
         )}
 
@@ -865,7 +914,12 @@ export default function App() {
                     const isLow = p.total_quantity <= p.min_stock_level;
                     const pct = Math.min((p.total_quantity / (p.min_stock_level * 3)) * 100, 100);
                     return (
-                      <tr key={p.id}>
+                      <tr 
+                        key={p.id} 
+                        style={{ cursor: 'pointer' }} 
+                        onClick={() => setSelectedProduct(p)}
+                        title={lang === 'es' ? 'Ver detalles de este producto' : 'Click to view product details'}
+                      >
                         <td style={{ fontWeight: '600', color: 'var(--primary)' }}>{p.sku}</td>
                         <td>
                           <div>
@@ -1402,6 +1456,147 @@ export default function App() {
                 <button type="submit" className="btn btn-primary">{lang === 'es' ? 'Guardar Borrador' : 'Save Draft'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* PRODUCT DETAIL MODAL */}
+      {selectedProduct && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '750px', width: '95%' }}>
+            <div className="modal-header" style={{ borderBottom: 'var(--border-hairline-active)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="badge badge-approved" style={{ fontSize: '0.8rem', padding: '4px 8px' }}>{selectedProduct.sku}</span>
+                <h2>{selectedProduct.name}</h2>
+              </div>
+              <button className="modal-close" onClick={() => setSelectedProduct(null)}><X size={20} /></button>
+            </div>
+            
+            <div className="modal-body" style={{ maxHeight: '520px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              
+              {/* Info Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', backgroundColor: 'rgba(6, 182, 212, 0.15)', border: '1px solid rgba(6, 182, 212, 0.15)' }}>
+                <div style={{ backgroundColor: 'var(--bg-darker)', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Precio Unitario' : 'Unit Price'}</div>
+                  <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>${parseFloat(selectedProduct.price as any).toFixed(2)}</strong>
+                </div>
+                <div style={{ backgroundColor: 'var(--bg-darker)', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Stock Mínimo' : 'Min Stock'}</div>
+                  <strong style={{ fontSize: '1.1rem', color: 'var(--warning)' }}>{selectedProduct.min_stock_level}</strong>
+                </div>
+                <div style={{ backgroundColor: 'var(--bg-darker)', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Stock Total' : 'Total Stock'}</div>
+                  <strong style={{ fontSize: '1.1rem', color: selectedProduct.total_quantity <= selectedProduct.min_stock_level ? 'var(--danger)' : 'var(--success)' }}>
+                    {selectedProduct.total_quantity}
+                  </strong>
+                </div>
+                <div style={{ backgroundColor: 'var(--bg-darker)', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Categoría' : 'Category'}</div>
+                  <strong style={{ fontSize: '0.85rem' }}>{selectedProduct.category_name}</strong>
+                </div>
+              </div>
+
+              {/* Description */}
+              {selectedProduct.description && (
+                <div style={{ backgroundColor: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(6, 182, 212, 0.2)', padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  <strong>{lang === 'es' ? 'Descripción: ' : 'Description: '}</strong>{selectedProduct.description}
+                </div>
+              )}
+
+              {/* Warehouse Stock Grid */}
+              <div>
+                <h3 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', color: 'var(--text-secondary)' }}>
+                  🏢 {lang === 'es' ? 'Distribución por Almacén' : 'Warehouse Distribution'}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  {warehouses.map(w => {
+                    const stock = selectedProduct.stocks.find(s => s.warehouse === w.id);
+                    const qty = stock ? stock.quantity : 0;
+                    const pct = Math.min((qty / w.capacity) * 100, 100);
+                    return (
+                      <div key={w.id} style={{ backgroundColor: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '8px' }}>
+                          <span style={{ fontWeight: '600' }}>{w.name}</span>
+                          <span style={{ fontWeight: 'bold', color: qty > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>
+                            {qty} {lang === 'es' ? 'unidades' : 'units'}
+                          </span>
+                        </div>
+                        <div className="progress-track" style={{ height: '4px' }}>
+                          <div className="progress-bar normal" style={{ width: `${pct}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Transactions History Logs for this product */}
+              <div>
+                <h3 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', color: 'var(--text-secondary)' }}>
+                  🔄 {lang === 'es' ? 'Historial de Movimientos de este Producto' : 'Stock Movements for this Product'}
+                </h3>
+                <div className="table-container" style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid var(--border-color)' }}>
+                  <table className="custom-table" style={{ fontSize: '0.8rem' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: '8px' }}>{lang === 'es' ? 'Fecha' : 'Date'}</th>
+                        <th style={{ padding: '8px' }}>{lang === 'es' ? 'Almacén' : 'Warehouse'}</th>
+                        <th style={{ padding: '8px' }}>{lang === 'es' ? 'Tipo' : 'Type'}</th>
+                        <th style={{ padding: '8px' }}>{t.qty}</th>
+                        <th style={{ padding: '8px' }}>{t.refId}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transactions.filter(t => t.product === selectedProduct.id).map(tx => (
+                        <tr key={tx.id}>
+                          <td style={{ padding: '8px' }}>{new Date(tx.created_at).toLocaleDateString()}</td>
+                          <td style={{ padding: '8px' }}>{tx.warehouse_name}</td>
+                          <td style={{ padding: '8px' }}>
+                            <span className={`badge ${
+                              tx.type === 'IN' ? 'badge-in' : 
+                              tx.type === 'OUT' ? 'badge-out' : 
+                              tx.type === 'TRANSFER' ? 'badge-transfer' : 'badge-adjustment'
+                            }`} style={{ fontSize: '0.65rem', padding: '1px 4px' }}>
+                              {tx.type === 'IN' ? t.badgeIn : 
+                               tx.type === 'OUT' ? t.badgeOut : 
+                               tx.type === 'TRANSFER' ? t.badgeTransfer : t.badgeAdjustment}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px', fontWeight: 'bold', color: tx.type === 'IN' ? 'var(--success)' : tx.type === 'OUT' ? 'var(--danger)' : 'inherit' }}>
+                            {tx.type === 'IN' ? '+' : tx.type === 'OUT' ? '-' : ''}{tx.quantity}
+                          </td>
+                          <td style={{ padding: '8px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{tx.reference_id}</td>
+                        </tr>
+                      ))}
+                      {transactions.filter(t => t.product === selectedProduct.id).length === 0 && (
+                        <tr>
+                          <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '20px 0' }}>
+                            {lang === 'es' ? 'Sin movimientos registrados' : 'No movements registered'}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                style={{ marginRight: 'auto' }}
+                onClick={() => {
+                  setNewAdjust(prev => ({ ...prev, product: String(selectedProduct.id), type: 'IN' }));
+                  setSelectedProduct(null);
+                  setShowAdjustModal(true);
+                }}
+              >
+                🛠️ {lang === 'es' ? 'Ajustar Stock' : 'Adjust Stock'}
+              </button>
+              <button type="button" className="btn btn-primary" onClick={() => setSelectedProduct(null)}>{lang === 'es' ? 'Cerrar' : 'Close'}</button>
+            </div>
           </div>
         </div>
       )}
