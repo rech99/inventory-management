@@ -12,6 +12,7 @@ El diseño sigue una estética técnica **OLED Dark Mode** de alta precisión co
 * **`frontend-web/`**: Panel administrativo SPA construido con React + Vite + TypeScript. Permite visualizar analíticas, gestionar el stock, aprobar órdenes de compra, y ver actualizaciones en tiempo real gracias a conexiones WebSocket.
 * **`mobile/`**: Aplicación de almacén en React Native con Expo. Permite a los operarios escanear SKUs de forma simulada, registrar movimientos rápidos de stock e ingresar la recepción física de mercancías asociadas a órdenes de compra.
 * **`design-system/`**: Carpeta que contiene las guías de estilos, colores, tipografía e identidad visual de G-Inventory ([MASTER.md](design-system/g-inventory/MASTER.md)).
+* **`docs/`**: Documentación de la [Arquitectura y Diseño del Sistema](docs/ARCHITECTURE.md) (Diagramas de secuencia, WebSockets, Base de Datos y Roles).
 
 ---
 
