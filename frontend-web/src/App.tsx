@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { translations } from './translations';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api';
 
 interface Category {
   id: number;
@@ -176,7 +176,12 @@ export default function App() {
   useEffect(() => {
     if (!token) return;
 
-    const socket = new WebSocket('ws://localhost:8000/ws/inventory/updates/');
+    // Derivar URL de WS dinámicamente desde API_BASE
+    const wsBaseUrl = API_BASE.replace(/\/api$/, '').replace(/\/$/, '');
+    const wsProto = wsBaseUrl.startsWith('https') ? 'wss' : 'ws';
+    const wsUrl = `${wsBaseUrl.replace(/^https?/, wsProto)}/ws/inventory/updates/`;
+
+    const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
       console.log('WS Connected');
