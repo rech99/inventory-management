@@ -173,6 +173,18 @@ export default function App() {
     return config;
   }, (error) => Promise.reject(error));
 
+  // Interceptor de respuesta para manejar errores 401 Unauthorized globalmente
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('access_token');
+        setToken(null);
+      }
+      return Promise.reject(error);
+    }
+  );
+
   // WebSocket connections
   useEffect(() => {
     if (!token) return;
