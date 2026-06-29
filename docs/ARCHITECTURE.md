@@ -10,18 +10,18 @@ El sistema sigue una arquitectura desacoplada basada en el patrón de **Single P
 
 ```mermaid
 graph TD
-    subgraph Cliente (Browser)
+    subgraph Cliente ["Cliente (Browser)"]
         FE[Frontend - React SPA]
         LS[(Local Storage - JWT)]
     end
 
-    subgraph Servidor de Aplicación
+    subgraph Servidor ["Servidor de Aplicación"]
         Gateway[Render / Vercel router]
         WS[Django Channels - WebSockets]
         REST[DRF - API REST]
     end
 
-    subgraph Capa de Datos
+    subgraph Datos ["Capa de Datos"]
         DB[(PostgreSQL / SQLite)]
     end
 
