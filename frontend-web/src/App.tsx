@@ -1532,7 +1532,7 @@ export default function App() {
                 <h3 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', color: 'var(--text-secondary)' }}>
                   🏢 {lang === 'es' ? 'Distribución por Almacén' : 'Warehouse Distribution'}
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {warehouses.map(w => {
                     const stock = selectedProduct.stocks.find(s => s.warehouse === w.id);
                     const qty = stock ? stock.quantity : 0;
