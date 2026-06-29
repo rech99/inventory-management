@@ -192,6 +192,25 @@ class Command(BaseCommand):
                     user=staff_user
                 )
 
+            # Seed a Transfer transaction pair (Main Central Warehouse -> East Coast Depot)
+            # Transfer 10 Wireless Optical Mouse (ELEC-001) from wh_main to wh_east
+            StockTransaction.objects.create(
+                product=products["ELEC-001"],
+                warehouse=wh_main,
+                type='TRANSFER',
+                quantity=10,
+                reference_id=f"TRANSFER_TO_{wh_east.id}",
+                user=manager_user
+            )
+            StockTransaction.objects.create(
+                product=products["ELEC-001"],
+                warehouse=wh_east,
+                type='IN',
+                quantity=10,
+                reference_id=f"TRANSFER_FROM_{wh_main.id}",
+                user=manager_user
+            )
+
             # 8. Seed Purchase Orders in Different States
             self.stdout.write("Seeding purchase orders...")
 

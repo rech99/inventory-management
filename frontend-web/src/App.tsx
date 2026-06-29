@@ -146,6 +146,8 @@ export default function App() {
   const [showPOModal, setShowPOModal] = useState(false);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
+  const [selectedTransfer, setSelectedTransfer] = useState<Transaction | null>(null);
   
   // Form values
   const [newProduct, setNewProduct] = useState({ sku: '', name: '', description: '', price: '', category: '', min_stock: '10' });
@@ -1004,7 +1006,12 @@ export default function App() {
                 </thead>
                 <tbody>
                   {orders.map(o => (
-                    <tr key={o.id}>
+                    <tr 
+                      key={o.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedOrder(o)}
+                      title={lang === 'es' ? 'Ver detalles de esta orden' : 'Click to view order details'}
+                    >
                       <td style={{ fontWeight: '600', color: 'var(--primary)' }}>{o.order_number}</td>
                       <td>{o.supplier_name}</td>
                       <td>{new Date(o.created_at).toLocaleDateString()}</td>
@@ -1028,14 +1035,14 @@ export default function App() {
                               <button 
                                 className="btn btn-secondary" 
                                 style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-                                onClick={() => handlePOStatusUpdate(o.id, 'APPROVED')}
+                                onClick={(e) => { e.stopPropagation(); handlePOStatusUpdate(o.id, 'APPROVED'); }}
                               >
                                 {t.btnApprove}
                               </button>
                               <button 
                                 className="btn btn-danger" 
                                 style={{ padding: '6px 12px', fontSize: '0.75rem', boxShadow: 'none' }}
-                                onClick={() => handlePOStatusUpdate(o.id, 'CANCELLED')}
+                                onClick={(e) => { e.stopPropagation(); handlePOStatusUpdate(o.id, 'CANCELLED'); }}
                               >
                                 {t.btnCancel}
                               </button>
@@ -1045,7 +1052,7 @@ export default function App() {
                             <button 
                               className="btn btn-primary" 
                               style={{ padding: '6px 12px', fontSize: '0.75rem', boxShadow: 'none' }}
-                              onClick={() => handlePOStatusUpdate(o.id, 'RECEIVED')}
+                              onClick={(e) => { e.stopPropagation(); handlePOStatusUpdate(o.id, 'RECEIVED'); }}
                             >
                               <Truck size={12} /> {t.btnReceive}
                             </button>
@@ -1121,7 +1128,12 @@ export default function App() {
                 </thead>
                 <tbody>
                   {transactions.filter(t => t.type === 'TRANSFER' || t.reference_id?.includes('TRANSFER')).map(tx => (
-                    <tr key={tx.id}>
+                    <tr 
+                      key={tx.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedTransfer(tx)}
+                      title={lang === 'es' ? 'Ver detalles de esta transferencia' : 'Click to view transfer details'}
+                    >
                       <td>{new Date(tx.created_at).toLocaleString()}</td>
                       <td style={{ fontWeight: '500' }}>{tx.product_name}</td>
                       <td>
@@ -1608,6 +1620,219 @@ export default function App() {
                 🛠️ {lang === 'es' ? 'Ajustar Stock' : 'Adjust Stock'}
               </button>
               <button type="button" className="btn btn-primary" onClick={() => setSelectedProduct(null)}>{lang === 'es' ? 'Cerrar' : 'Close'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PURCHASE ORDER DETAIL MODAL */}
+      {selectedOrder && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '650px', width: '95%' }}>
+            <div className="modal-header" style={{ borderBottom: 'var(--border-hairline-active)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="badge badge-approved" style={{ fontSize: '0.8rem', padding: '4px 8px' }}>{selectedOrder.order_number}</span>
+                <h2>{lang === 'es' ? 'Detalle de Orden de Compra' : 'Purchase Order Details'}</h2>
+              </div>
+              <button className="modal-close" onClick={() => setSelectedOrder(null)}><X size={20} /></button>
+            </div>
+            
+            <div className="modal-body" style={{ maxHeight: '500px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* PO Info Card */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', backgroundColor: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{t.supplier}</div>
+                  <strong style={{ fontSize: '0.95rem' }}>{selectedOrder.supplier_name}</strong>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{t.date}</div>
+                  <strong>{new Date(selectedOrder.created_at).toLocaleDateString()}</strong>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{t.status}</div>
+                  <span className={`badge ${
+                    selectedOrder.status === 'PENDING' ? 'badge-pending' :
+                    selectedOrder.status === 'APPROVED' ? 'badge-approved' :
+                    selectedOrder.status === 'RECEIVED' ? 'badge-received' : 'badge-cancelled'
+                  }`}>
+                    {selectedOrder.status === 'PENDING' ? t.badgePending :
+                     selectedOrder.status === 'APPROVED' ? t.badgeApproved :
+                     selectedOrder.status === 'RECEIVED' ? t.badgeReceived : t.badgeCancelled}
+                  </span>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{t.totalAmount}</div>
+                  <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>${parseFloat(selectedOrder.total_amount as any).toFixed(2)}</strong>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div>
+                <h3 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', color: 'var(--text-secondary)' }}>
+                  📦 {lang === 'es' ? 'Productos Ordenados' : 'Ordered Products'}
+                </h3>
+                <div className="table-container" style={{ border: '1px solid var(--border-color)' }}>
+                  <table className="custom-table" style={{ fontSize: '0.8rem' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: '8px' }}>{t.sku}</th>
+                        <th style={{ padding: '8px' }}>{t.name}</th>
+                        <th style={{ padding: '8px' }}>{t.qty}</th>
+                        <th style={{ padding: '8px' }}>{lang === 'es' ? 'P. Unitario' : 'U. Price'}</th>
+                        <th style={{ padding: '8px', textAlign: 'right' }}>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedOrder.items.map((item, idx) => (
+                        <tr key={idx}>
+                          <td style={{ padding: '8px', fontWeight: 'bold', color: 'var(--primary)' }}>{item.product_sku || 'N/A'}</td>
+                          <td style={{ padding: '8px' }}>{item.product_name || 'Product'}</td>
+                          <td style={{ padding: '8px' }}>{item.quantity}</td>
+                          <td style={{ padding: '8px' }}>${parseFloat(item.unit_price as any).toFixed(2)}</td>
+                          <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>
+                            ${(item.quantity * item.unit_price).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              {/* Action shortcuts in modal */}
+              {selectedOrder.status === 'PENDING' && (
+                <div style={{ display: 'flex', gap: '8px', marginRight: 'auto' }}>
+                  <button 
+                    className="btn btn-secondary" 
+                    style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                    onClick={() => {
+                      handlePOStatusUpdate(selectedOrder.id, 'APPROVED');
+                      setSelectedOrder(null);
+                    }}
+                  >
+                    {t.btnApprove}
+                  </button>
+                  <button 
+                    className="btn btn-danger" 
+                    style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                    onClick={() => {
+                      handlePOStatusUpdate(selectedOrder.id, 'CANCELLED');
+                      setSelectedOrder(null);
+                    }}
+                  >
+                    {t.btnCancel}
+                  </button>
+                </div>
+              )}
+              {selectedOrder.status === 'APPROVED' && (
+                <button 
+                  className="btn btn-primary" 
+                  style={{ padding: '6px 12px', fontSize: '0.75rem', marginRight: 'auto' }}
+                  onClick={() => {
+                    handlePOStatusUpdate(selectedOrder.id, 'RECEIVED');
+                    setSelectedOrder(null);
+                  }}
+                >
+                  <Truck size={12} /> {t.btnReceive}
+                </button>
+              )}
+              <button type="button" className="btn btn-primary" onClick={() => setSelectedOrder(null)}>{lang === 'es' ? 'Cerrar' : 'Close'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TRANSFER DETAIL MODAL */}
+      {selectedTransfer && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '550px', width: '95%' }}>
+            <div className="modal-header" style={{ borderBottom: 'var(--border-hairline-active)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="badge badge-transfer" style={{ fontSize: '0.8rem', padding: '4px 8px' }}>
+                  {lang === 'es' ? 'Transferencia' : 'Transfer Log'}
+                </span>
+                <h2>{selectedTransfer.reference_id}</h2>
+              </div>
+              <button className="modal-close" onClick={() => setSelectedTransfer(null)}><X size={20} /></button>
+            </div>
+            
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Product and General Details */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', backgroundColor: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Producto' : 'Product'}</div>
+                  <strong style={{ color: 'var(--primary)' }}>{selectedTransfer.product_name}</strong>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>SKU: {selectedTransfer.product_sku}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Cantidad' : 'Quantity'}</div>
+                  <strong style={{ fontSize: '1.2rem', color: 'var(--primary)' }}>{selectedTransfer.quantity} {lang === 'es' ? 'unidades' : 'units'}</strong>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Operador' : 'Operator'}</div>
+                  <strong>{selectedTransfer.user_name}</strong>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-gray)', textTransform: 'uppercase', marginBottom: '4px' }}>{lang === 'es' ? 'Fecha y Hora' : 'Date / Time'}</div>
+                  <span style={{ fontSize: '0.85rem' }}>{new Date(selectedTransfer.created_at).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Visual Flow Diagram */}
+              <div>
+                <h3 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                  {lang === 'es' ? 'Flujo de Transferencia' : 'Transfer Logistics Flow'}
+                </h3>
+                
+                {(() => {
+                  const isTo = selectedTransfer.reference_id?.startsWith('TRANSFER_TO');
+                  const otherWhId = selectedTransfer.reference_id?.split('_').pop();
+                  const otherWh = warehouses.find(w => w.id === parseInt(otherWhId || ''));
+                  const otherWhName = otherWh ? otherWh.name : `Warehouse ${otherWhId}`;
+                  
+                  const fromWhName = isTo ? selectedTransfer.warehouse_name : otherWhName;
+                  const toWhName = isTo ? otherWhName : selectedTransfer.warehouse_name;
+                  
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '16px', backgroundColor: 'rgba(6, 182, 212, 0.02)', border: '1px dashed rgba(6, 182, 212, 0.2)' }}>
+                      <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                        
+                        {/* Source Warehouse Box */}
+                        <div style={{ flex: 1, border: '1px solid var(--border-color)', padding: '10px', textAlign: 'center', fontSize: '0.8rem', backgroundColor: 'var(--bg-darker)' }}>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--text-gray)', marginBottom: '4px' }}>{lang === 'es' ? 'ORIGEN' : 'SOURCE'}</div>
+                          <strong style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{fromWhName}</strong>
+                        </div>
+
+                        {/* Arrow with Qty */}
+                        <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', backgroundColor: 'var(--bg-darker)', padding: '2px 6px', border: '1px solid rgba(6,182,212,0.3)', zIndex: 1, marginBottom: '-8px' }}>
+                            {selectedTransfer.quantity} {lang === 'es' ? 'uds' : 'units'}
+                          </span>
+                          <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--primary)', position: 'relative', margin: '12px 0' }}>
+                            <div style={{ position: 'absolute', right: '0', top: '-3px', width: '7px', height: '7px', borderTop: '1px solid var(--primary)', borderRight: '1px solid var(--primary)', transform: 'rotate(45deg)' }}></div>
+                          </div>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            {lang === 'es' ? 'En Tránsito' : 'In Transit'}
+                          </span>
+                        </div>
+
+                        {/* Target Warehouse Box */}
+                        <div style={{ flex: 1, border: '1px solid var(--primary)', padding: '10px', textAlign: 'center', fontSize: '0.8rem', backgroundColor: 'var(--bg-darker)' }}>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--primary)', marginBottom: '4px' }}>{lang === 'es' ? 'DESTINO' : 'DESTINATION'}</div>
+                          <strong style={{ color: 'var(--text-primary)', fontSize: '0.75rem' }}>{toWhName}</strong>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={() => setSelectedTransfer(null)}>{lang === 'es' ? 'Cerrar' : 'Close'}</button>
             </div>
           </div>
         </div>
