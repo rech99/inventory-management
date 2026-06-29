@@ -22,7 +22,7 @@ graph TD
     end
 
     subgraph Datos ["Capa de Datos"]
-        DB[(PostgreSQL / SQLite)]
+        DB[(SQLite DB)]
     end
 
     FE -->|HTTPS / JWT| REST
@@ -37,7 +37,7 @@ graph TD
 *   **Backend (API & WebSockets)**: Django 5.x utilizando Django REST Framework (DRF) para exponer endpoints de base de datos y Django Channels + Daphne (ASGI) para gestionar el canal persistente de WebSockets.
 *   **Bases de Datos**:
     *   *Desarrollo*: SQLite (`backend/db.sqlite3`).
-    *   *Producción*: PostgreSQL administrada.
+    *   *Producción*: SQLite. Al tratarse de un proyecto de portafolio, se utiliza SQLite en ambas fases para mantener los costos de hosting en cero y facilitar la portabilidad del proyecto.
 
 ---
 
@@ -167,4 +167,4 @@ graph LR
 ```
 
 *   **Frontend (SPA)**: Servido estáticamente por **Vercel** con reglas de reescritura de rutas configuradas en `vercel.json`.
-*   **Backend (API)**: Alojado en **Render** ejecutando la aplicación con un servidor ASGI para el soporte concurrente de HTTP y WebSockets.
+*   **Backend (API)**: Alojado en **Render** ejecutando la aplicación con un servidor ASGI para el soporte concurrente de HTTP y WebSockets, utilizando SQLite para el almacenamiento de datos (solución ideal para demostraciones de portafolio rápidas y sin costo).
